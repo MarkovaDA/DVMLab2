@@ -5,10 +5,22 @@
  */
 package dvmlab2;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+
 /**
  *
  * @author Vitaliy
  */
+
 public class Tree {
+    List<Node> allNodes = new ArrayList<>();
     
+    Node findNextNodeWithMinEstimate() {
+        return Collections.min(allNodes, (Node o1, Node o2) -> 
+                o1.getEstimate() - o2.getEstimate());
+    }
 }
