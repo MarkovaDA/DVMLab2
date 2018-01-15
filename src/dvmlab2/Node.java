@@ -3,7 +3,7 @@ package dvmlab2;
 
 
 public class Node  {
-    private int estimate;
+    /*private int estimate;
     private int[][] matrix;
     private boolean open; 
     
@@ -29,10 +29,12 @@ public class Node  {
     int jCol;
     boolean isRecord;//достигнут ли рекорд в этом узле?
     boolean isReduced; //данная матрица - результат исключения элемента {iRow,jCol}
+    int parentEstimate; //оценка матрицы в родительском узле
     
     public void processNode() {
         //вычисляем оценку матрицы
-        estimate = MatrixUtils.matrixEstimate(matrix);
+        estimate = parentEstimate + 
+                MatrixUtils.matrixEstimate(matrix);
         //выполняем приведение матрицы
         matrix = MatrixUtils.reduction(matrix);
         //выбираем ноль с наибольшей оценкой
@@ -56,7 +58,7 @@ public class Node  {
 
     public int getEstimate() {
         return estimate;
-    }
+    }*/
    
     //на очередном этапе для матрицы проводится редукция
     //считается оценка

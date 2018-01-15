@@ -6,30 +6,30 @@ package dvmlab2;
 public class MatrixUtils {
     //!!!диагональные элементы рассматрению не подлежат
     //диагональные элементы отмечаются -1
-    static int min(int[] arr) {
-        int min = Integer.MAX_VALUE;
-        for(int i=0; i < arr.length; i++) {
-            if (arr[i] != -1 && arr[i] < min)
+    static Integer min(Integer[] arr) {
+        Integer min = -1;
+        for(Integer i=0; i < arr.length; i++) {
+            if (arr[i] != -1 && (arr[i] < min || min == -1))
                 min=arr[i];
         }
-        return min;
+        return min >= 0 ? min : 0;
     }  
     //min элемент в каждой строке
-    public static int[] minInRows(int[][] matrix) {
-        int size = matrix.length;
-        int[] res = new int[size];
-        for(int i=0; i < size; i++) {
+    public static Integer[] minInRows(Integer[][] matrix) {
+        Integer size = matrix.length;
+        Integer[] res = new Integer[size];
+        for(Integer i=0; i < size; i++) {
             res[i] = min(matrix[i]);
         }
         return res;
     }
     //min элемент в каждом столбце
-    public static int[] minInCols(int[][] matrix) {
-        int size = matrix.length;
-        int[] res = new int[size];
-        int min, j;
+    public static Integer[] minInCols(Integer[][] matrix) {
+        Integer size = matrix.length;
+        Integer[] res = new Integer[size];
+        Integer min, j;
         for(j=0; j < size; j++) {
-            int i = 0;
+            Integer i = 0;
             min = Integer.MAX_VALUE;
             for(i=0; i < size; i++) {
                 if (matrix[i][j] != -1 && matrix[i][j] < min)
@@ -40,21 +40,21 @@ public class MatrixUtils {
         return res;
     }
     //приведение матрицы (по строкам и столбцам)
-    public static int[][] reduction(int[][] matrix) {
-        int[] inRows = minInRows(matrix);
-        int size = matrix.length;
+    public static Integer[][] reduction(Integer[][] matrix) {
+        Integer[] inRows = minInRows(matrix);
+        Integer size = matrix.length;
         
-        for(int i=0; i < size; i++) {
-            for(int j=0; j < size; j++) {
+        for(Integer i=0; i < size; i++) {
+            for(Integer j=0; j < size; j++) {
                 if (matrix[i][j] != -1)
                     matrix[i][j] -= inRows[i];
             }
         }
         
-        int[] inCols = minInCols(matrix);
+        Integer[] inCols = minInCols(matrix);
         
-        for(int i=0; i < size; i++) {
-            for(int j=0; j < size; j++) {
+        for(Integer i=0; i < size; i++) {
+            for(Integer j=0; j < size; j++) {
                 if (matrix[i][j] != -1)
                     matrix[i][j] -= inCols[j];
             }
@@ -63,17 +63,17 @@ public class MatrixUtils {
     }
     
     //расчет оценки для элемента матрицы (min-элемент в строке + min-элемент в столбце)
-    static int elemEstimate(int row, int col, int[][] matrix) {
-        int i;
-        int size = matrix.length;
-        int minCol = Integer.MAX_VALUE;
-        int minRow = Integer.MAX_VALUE;
+    static Integer elemEstimate(Integer row, Integer col, Integer[][] matrix) {
+        Integer i;
+        Integer size = matrix.length;
+        Integer minCol = Integer.MAX_VALUE;
+        Integer minRow = Integer.MAX_VALUE;
         
         for(i=0; i < size; i++) {
-            if (i != row && matrix[i][col] != -1 && matrix[i][col] < minRow)
+            if (i != row && matrix[i][col] >= 0 && matrix[i][col] < minRow)
                 minRow = matrix[i][col];
             
-            if (i != col && matrix[row][i] != -1 && matrix[row][i] < minCol)
+            if (i != col && matrix[row][i] >= 0 && matrix[row][i] < minCol)
                 minCol = matrix[row][i];
         }
         return minCol + minRow;
@@ -83,37 +83,45 @@ public class MatrixUtils {
     /*
     *Returns: индекс строки и столбца
     */
-    public static int[] findZero(int[][] matrix) {
-        int maxZeroEstimate = Integer.MIN_VALUE;
-        int minRow = -1;
-        int minCol = -1;
+    public static Integer[] findZero(Integer[][] matrix) {
+        Integer maxZeroEstimate = Integer.MIN_VALUE;
+        Integer minRow = -1;
+        Integer minCol = -1;
         
-        int size = matrix.length;
-        
-        for(int i=0; i < size; i++) {
-            for(int j=0; j < size; j++) {
-                if (matrix[i][j] == 0 && matrix[i][j] != -1 && matrix[i][j] > maxZeroEstimate) {
+        Integer size = matrix.length;
+        Integer estimate;
+        for(Integer i=0; i < size; i++) {
+            for(Integer j=0; j < size; j++) {
+                if (matrix[i][j] == 0) {
+                    estimate = elemEstimate(i,j, matrix);
+                    if (estimate > maxZeroEstimate) {
+                        maxZeroEstimate = estimate;
+                        minRow = i;
+                        minCol = j;
+                    }
+                }
+                /*if (matrix[i][j] == 0 && matrix[i][j] > maxZeroEstimate) {
                     maxZeroEstimate = matrix[i][j];
                     minRow = i;
                     minCol = j;
-                }
+                }*/
             }
         }
-        int[] indexes = new int[]{minRow, minCol};
+        Integer[] indexes = new Integer[]{minRow, minCol};
         return indexes;
     }
     
     //изъятие элемента из матрицы - "схлопывание матрицы"
-    public static int[][] matrixResize(int row, int col, int[][] matrix) {
-        int size = matrix.length;
-        int[][] newMatrix = new int[size - 1][size - 1];
+    public static Integer[][] matrixResize(Integer row, Integer col, Integer[][] matrix) {
+        Integer size = matrix.length;
+        Integer[][] newMatrix = new Integer[size - 1][size - 1];
         
-        for(int i = 0; i < size; i++) {
-            int rowIndexSummand = i < row ? 0 : -1; 
-            for(int j = 0; j < size; j++) {
-                if(j < col && i != row) {
+        for(Integer i = 0; i < size; i++) {
+            Integer rowIndexSummand = i < row ? 0 : -1; 
+            for(Integer j = 0; j < size; j++) {
+                if(j < col && !i.equals(row)) {
                     newMatrix[i + rowIndexSummand][j] = matrix[i][j];
-                } else if(j > col && i != row) {
+                } else if(j > col && !i.equals(row)) {
                     newMatrix[i + rowIndexSummand][j - 1] = matrix[i][j];
                 }
             }
@@ -121,27 +129,27 @@ public class MatrixUtils {
         return setDiagonalsUnavailable(newMatrix);        
     }
     
-    private static int[][] setDiagonalsUnavailable(int[][] matrix) {
-        int size = matrix.length;
-        for(int i=0; i < size; i++) {
+    private static Integer[][] setDiagonalsUnavailable(Integer[][] matrix) {
+        Integer size = matrix.length;
+        for(Integer i=0; i < size; i++) {
             matrix[i][i] = -1;
         }
         return matrix;
     }
     
-    public static int[][] matrixMarkElement(int row, int col, int[][] matrix) {
+    public static Integer[][] matrixMarkElement(Integer row, Integer col, Integer[][] matrix) {
         matrix[row][col] = -1;
         return matrix;
     }
     
     //расчет оценки матрицы - сумма оценок строк и столбцов
-    public static int matrixEstimate(int[][] matrix) {
-        int[] minInRows = minInRows(matrix);
-        int[] minInCols = minInCols(matrix);
+    public static Integer matrixEstimate(Integer[][] matrix) {
+        Integer[] minInRows = minInRows(matrix);
+        Integer[] minInCols = minInCols(matrix);
         
-        int size = matrix.length;
-        int sum = 0;
-        for(int i =0; i < size; i++) {
+        Integer size = matrix.length;
+        Integer sum = 0;
+        for(Integer i =0; i < size; i++) {
             sum += (minInRows[i] + minInCols[i]);
         }
         return sum;
